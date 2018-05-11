@@ -90,6 +90,7 @@ namespace CreateClosureData
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
             wait.PollingInterval = TimeSpan.FromSeconds(10);
             wait.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
+
             requestorElement = wait.Until(theDriver => theDriver.FindElement(By.XPath("//input[@name='AM_RECIPIENT.LAST_NAME']")));
             categoryElement = wait.Until(theDriver => theDriver.FindElement(By.XPath("//input[contains(@id, 'SD_CATALOG.TITLE_EN')] [contains(@class, 'form_input_ro')]")));
             tableElement = wait.Until(theDriver => theDriver.FindElement(By.XPath("//table[@id='tbl_dialog_body_section_1_0']")));
@@ -107,12 +108,12 @@ namespace CreateClosureData
 
           
                     tableElement = driver.FindElement(By.XPath("//table[@id='tbl_dialog_body_section_1_0']"));
-                    //thisTicket.SolvedBy = tableElement.FindElement(By.XPath("//td[contains(., ',')]")).Text;
+                    thisTicket.SolvedBy = tableElement.FindElement(By.XPath("//td[contains(., ',')]")).Text;
          
 
          
                     descriptionElement = driver.FindElement(By.XPath("//div[@id='SD_REQUEST_COMMENT1']"));
-                    //thisTicket.Description = descriptionElement.Text;
+                    thisTicket.Description = descriptionElement.Text;
            
       
 
