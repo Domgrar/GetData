@@ -91,26 +91,28 @@ namespace CreateClosureData
             wait.PollingInterval = TimeSpan.FromSeconds(10);
             wait.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
             requestorElement = wait.Until(theDriver => theDriver.FindElement(By.XPath("//input[@name='AM_RECIPIENT.LAST_NAME']")));
-
+            categoryElement = wait.Until(theDriver => theDriver.FindElement(By.XPath("//input[contains(@id, 'SD_CATALOG.TITLE_EN')] [contains(@class, 'form_input_ro')]")));
+            tableElement = wait.Until(theDriver => theDriver.FindElement(By.XPath("//table[@id='tbl_dialog_body_section_1_0']")));
+            descriptionElement = wait.Until(theDriver => theDriver.FindElement(By.XPath("//div[@id='SD_REQUEST_COMMENT1']")));
         
             
             //driver.FindElement(By.XPath("//input[@name='AM_RECIPIENT.LAST_NAME']"));        // Gets the manager
-                    thisTicket.Requestor = requestorElement.GetAttribute("value").ToString();
+                    thisTicket.Requestor = wait.Until(theDriver => theDriver.FindElement(By.XPath("//input[@name='AM_RECIPIENT.LAST_NAME']")).GetAttribute("value"));
 
 
-           
-                    categoryElement = driver.FindElement(By.XPath("//input[contains(@id, 'SD_CATALOG.TITLE_EN')] [contains(@class, 'form_input_ro')]"));
-                    thisTicket.Category = categoryElement.GetAttribute("value").ToString();
+
+            //categoryElement = driver.FindElement(By.XPath("//input[contains(@id, 'SD_CATALOG.TITLE_EN')] [contains(@class, 'form_input_ro')]"));
+            thisTicket.Category = wait.Until(theDriver => theDriver.FindElement(By.XPath("//input[contains(@id, 'SD_CATALOG.TITLE_EN')] [contains(@class, 'form_input_ro')]")).GetAttribute("value").ToString());
            
 
           
                     tableElement = driver.FindElement(By.XPath("//table[@id='tbl_dialog_body_section_1_0']"));
-                    thisTicket.SolvedBy = tableElement.FindElement(By.XPath("//td[contains(., ',')]")).Text;
+                    //thisTicket.SolvedBy = tableElement.FindElement(By.XPath("//td[contains(., ',')]")).Text;
          
 
          
                     descriptionElement = driver.FindElement(By.XPath("//div[@id='SD_REQUEST_COMMENT1']"));
-                    thisTicket.Description = descriptionElement.Text;
+                    //thisTicket.Description = descriptionElement.Text;
            
       
 
