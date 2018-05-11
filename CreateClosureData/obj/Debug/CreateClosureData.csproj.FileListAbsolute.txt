@@ -16,3 +16,5 @@ C:\Users\jf6856\OneDrive - DHG LLP\GitHub\GetData\GetData\CreateClosureData\obj\
 C:\Users\jf6856\OneDrive - DHG LLP\GitHub\GetData\GetData\CreateClosureData\obj\Debug\CreateClosureData.csproj.CoreCompileInputs.cache
 C:\Users\jf6856\OneDrive - DHG LLP\GitHub\GetData\GetData\CreateClosureData\obj\Debug\CreateClosureData.exe
 C:\Users\jf6856\OneDrive - DHG LLP\GitHub\GetData\GetData\CreateClosureData\obj\Debug\CreateClosureData.pdb
+C:\Users\jf6856\OneDrive - DHG LLP\GitHub\GetData\GetData\CreateClosureData\bin\Debug\CsvHelper.dll
+C:\Users\jf6856\OneDrive - DHG LLP\GitHub\GetData\GetData\CreateClosureData\bin\Debug\CsvHelper.xml
