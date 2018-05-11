@@ -34,14 +34,6 @@ namespace CreateClosureData
             dropDownMenu.SendKeys(Keys.ArrowDown);
             dropDownMenu.SendKeys(Keys.Enter);
 
-            
-            
-
-
-           
-
-    
-
 
             ticketList = GetIncidentList();
             
@@ -65,6 +57,7 @@ namespace CreateClosureData
         /// </summary>
         /// <param name="incidentNumber"></param>
         /// <returns></returns>
+        #region getTicketDataRegion
         public static Ticket getAllTicketData(string incidentNumber, IWebDriver driver)
         {
             
@@ -121,6 +114,9 @@ namespace CreateClosureData
 
             return thisTicket;
         }
+        #endregion
+
+
         public static bool WriteAllValues(Ticket thisTicket)
         {
 
