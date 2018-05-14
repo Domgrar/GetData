@@ -111,7 +111,8 @@ namespace CreateClosureData
          
                     descriptionElement = driver.FindElement(By.XPath("//div[@id='SD_REQUEST_COMMENT1']"));
                     thisTicket.Description = descriptionElement.Text;
-           
+
+            IList<IWebElement> tableRow = tableElement.FindElements(By.TagName("tr"));
       
 
             
