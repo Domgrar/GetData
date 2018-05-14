@@ -90,31 +90,62 @@ namespace CreateClosureData
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
             wait.PollingInterval = TimeSpan.FromSeconds(10);
             wait.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
-            requestorElement = wait.Until(theDriver => theDriver.FindElement(By.XPath("//input[@name='AM_RECIPIENT.LAST_NAME']")));
 
-        
-            
+
+
+
             //driver.FindElement(By.XPath("//input[@name='AM_RECIPIENT.LAST_NAME']"));        // Gets the manager
-                    thisTicket.Requestor = requestorElement.GetAttribute("value").ToString();
+            requestorElement = wait.Until(theDriver => theDriver.FindElement(By.XPath("//input[@name='AM_RECIPIENT.LAST_NAME']")));
+            thisTicket.Requestor = requestorElement.GetAttribute("value").ToString();
 
 
-           
-                    categoryElement = driver.FindElement(By.XPath("//input[contains(@id, 'SD_CATALOG.TITLE_EN')] [contains(@class, 'form_input_ro')]"));
-                    thisTicket.Category = categoryElement.GetAttribute("value").ToString();
-           
+            categoryElement = wait.Until(theDriver => theDriver.FindElement(By.XPath("//input[contains(@id, 'SD_CATALOG.TITLE_EN')] [contains(@class, 'form_input_ro')]")));
+            //categoryElement = driver.FindElement(By.XPath("//input[contains(@id, 'SD_CATALOG.TITLE_EN')] [contains(@class, 'form_input_ro')]"));
+            thisTicket.Category = categoryElement.GetAttribute("value").ToString();
 
-          
-                    tableElement = driver.FindElement(By.XPath("//table[@id='tbl_dialog_body_section_1_0']"));
-                    thisTicket.SolvedBy = tableElement.FindElement(By.XPath("//td[contains(., ',')]")).Text;
-         
 
-         
-                    descriptionElement = driver.FindElement(By.XPath("//div[@id='SD_REQUEST_COMMENT1']"));
-                    thisTicket.Description = descriptionElement.Text;
+            tableElement = wait.Until(theDriver => theDriver.FindElement(By.XPath("//table[@id='tbl_dialog_body_section_1_0']")));
+            //tableElement = driver.FindElement(By.XPath("//table[@id='tbl_dialog_body_section_1_0']"));
+            //thisTicket.SolvedBy = tableElement.FindElement(By.XPath("//td[contains(., ',')]")).Text;
 
+
+            descriptionElement = wait.Until(theDriver => theDriver.FindElement(By.XPath("//div[@id='SD_REQUEST_COMMENT1']")));
+                    //descriptionElement = driver.FindElement(By.XPath("//div[@id='SD_REQUEST_COMMENT1']"));
+            thisTicket.Description = descriptionElement.Text;
+
+
+            //Disgusting code below
+
+            //IList<IWebElement> tableRow = tableElement.FindElements(By.TagName("tr"));
             IList<IWebElement> tableRow = tableElement.FindElements(By.TagName("tr"));
-      
+            IList<IWebElement> td;
+            string solvedBy;
+            i = 0;
+            int z = 0;
+            Console.WriteLine("***TR Data***");
+            foreach(IWebElement element in tableRow)
+            {
+                if (i == 1) {
+                    Console.WriteLine(element.Text);
 
+                    td = element.FindElements(By.TagName("td"));
+                    foreach (IWebElement data in td)
+                    {
+                        if (z == 4)
+                        {
+                            Console.Write("DATA: ");
+                            Console.WriteLine(data.Text + "**********");
+                            thisTicket.SolvedBy = data.Text;
+                            break;
+                        }
+                        z++;
+                    }
+                }
+                //td = element.FindElement()
+                i++;
+            }
+      
+            
             
 
             return thisTicket;
@@ -129,7 +160,7 @@ namespace CreateClosureData
         public static List<string> GetIncidentList()
         {
             List<string> iList = new List<string>();
-            string text = System.IO.File.ReadAllText(@"C:\Users\jf6856\source\repos\CreateClosureData\CreateClosureData\TicketCloses.txt"); // Upgrade to relative path
+            string text = System.IO.File.ReadAllText(@"C:\Users\jf6856\OneDrive - DHG LLP\GitHub\GetData\GetData\CreateClosureData\TicketCloses.txt"); // Upgrade to relative path
 
             iList.AddRange(text.Split(' '));
  
