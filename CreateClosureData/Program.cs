@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CreateClosureData
@@ -55,6 +56,7 @@ namespace CreateClosureData
                 Console.WriteLine("Category : " + thisTicket.Category);
                 Console.WriteLine("Solved by : " + thisTicket.SolvedBy);
                 Console.WriteLine("Description : " + thisTicket.Description);
+                Console.WriteLine("**************************************************************");
             }
 
             Console.ReadLine();
@@ -67,7 +69,7 @@ namespace CreateClosureData
         /// <returns></returns>
         public static Ticket getAllTicketData(string incidentNumber, IWebDriver driver)
         {
-            
+
             IWebElement incidentSearch;
             IWebElement requestorElement;
             IWebElement categoryElement;
@@ -84,36 +86,86 @@ namespace CreateClosureData
             incidentSearch.SendKeys(incidentNumber);
             incidentSearch.SendKeys(Keys.Enter);
 
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            Thread.Sleep(2000);
 
+            Type[] ignores = new Type[] { typeof(OpenQA.Selenium.StaleElementReferenceException) };
             //Get the elements we need and their text
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.PollingInterval = TimeSpan.FromSeconds(10);
-            wait.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
-            requestorElement = wait.Until(theDriver => theDriver.FindElement(By.XPath("//input[@name='AM_RECIPIENT.LAST_NAME']")));
+            wait.PollingInterval = TimeSpan.FromSeconds(30);
+            wait.IgnoreExceptionTypes(ignores);
 
-        
-            
+
+            //driver.Navigate().Refresh();
+
             //driver.FindElement(By.XPath("//input[@name='AM_RECIPIENT.LAST_NAME']"));        // Gets the manager
-                    thisTicket.Requestor = requestorElement.GetAttribute("value").ToString();
-
-
            
-                    categoryElement = driver.FindElement(By.XPath("//input[contains(@id, 'SD_CATALOG.TITLE_EN')] [contains(@class, 'form_input_ro')]"));
-                    thisTicket.Category = categoryElement.GetAttribute("value").ToString();
-           
+            thisTicket.Requestor = wait.Until(theDriver => theDriver.FindElement(By.XPath("//input[@name='AM_RECIPIENT.LAST_NAME']"))).GetAttribute("value").ToString();
+            //thisTicket.Requestor = requestorElement.GetAttribute("value").ToString();
 
-          
-                    tableElement = driver.FindElement(By.XPath("//table[@id='tbl_dialog_body_section_1_0']"));
-                    thisTicket.SolvedBy = tableElement.FindElement(By.XPath("//td[contains(., ',')]")).Text;
-         
+            try // This next https://stackoverflow.com/questions/37837407/c-sharp-selenium-webdriver-raise-invalidoperationexception-ocurred-in-webdriver
+            {
+                thisTicket.Category = wait.Until(theDriver => theDriver.FindElement(By.XPath("//input[contains(@id, 'SD_CATALOG.TITLE_EN')] [contains(@class, 'form_input_ro')]"))).GetAttribute("value").ToString();
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+            }
+                //categoryElement = driver.FindElement(By.XPath("//input[contains(@id, 'SD_CATALOG.TITLE_EN')] [contains(@class, 'form_input_ro')]"));
+            //thisTicket.Category = categoryElement.GetAttribute("value").ToString();
 
-         
-                    descriptionElement = driver.FindElement(By.XPath("//div[@id='SD_REQUEST_COMMENT1']"));
-                    thisTicket.Description = descriptionElement.Text;
-           
+
+            tableElement = wait.Until(theDriver => theDriver.FindElement(By.XPath("//table[@id='tbl_dialog_body_section_1_0']")));
+            //tableElement = driver.FindElement(By.XPath("//table[@id='tbl_dialog_body_section_1_0']"));
+            //thisTicket.SolvedBy = tableElement.FindElement(By.XPath("//td[contains(., ',')]")).Text;
+
+
+            thisTicket.Description = wait.Until(theDriver => theDriver.FindElement(By.XPath("//div[@id='SD_REQUEST_COMMENT1']"))).Text;
+            //descriptionElement = driver.FindElement(By.XPath("//div[@id='SD_REQUEST_COMMENT1']"));
+            //thisTicket.Description = descriptionElement.Text;
+
+
+            //Disgusting code below
+
+            //IList<IWebElement> tableRow = tableElement.FindElements(By.TagName("tr"));
+            IList<IWebElement> tableRow;
+
+            try
+            {
+                tableRow = tableElement.FindElements(By.TagName("tr"));
+            }
+            catch (StaleElementReferenceException)
+            {
+                tableRow = wait.Until(theDriver => tableElement.FindElements(By.TagName("tr")));
+            }
+
+
+            IList<IWebElement> td;
+            string solvedBy;
+            i = 0;
+            int z = 0;
+            Console.WriteLine("***TR Data***");
+            foreach(IWebElement element in tableRow)
+            {
+                if (i == 1) {
+                    Console.WriteLine(element.Text);
+
+                    td = element.FindElements(By.TagName("td"));
+                    foreach (IWebElement data in td)
+                    {
+                        if (z == 4)
+                        {
+                            Console.Write("DATA: ");
+                            Console.WriteLine(data.Text + "**************************************************************");
+                            thisTicket.SolvedBy = data.Text;
+                            break;
+                        }
+                        z++;
+                    }
+                }
+                //td = element.FindElement()
+                i++;
+            }
       
-
+            
             
 
             return thisTicket;
@@ -128,7 +180,7 @@ namespace CreateClosureData
         public static List<string> GetIncidentList()
         {
             List<string> iList = new List<string>();
-            string text = System.IO.File.ReadAllText(@"C:\Users\jf6856\source\repos\CreateClosureData\CreateClosureData\TicketCloses.txt"); // Upgrade to relative path
+            string text = System.IO.File.ReadAllText(@"C:\Users\jf6856\OneDrive - DHG LLP\GitHub\GetData\GetData\CreateClosureData\TicketCloses.txt"); // Upgrade to relative path
 
             iList.AddRange(text.Split(' '));
  
