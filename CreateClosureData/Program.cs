@@ -75,10 +75,10 @@ namespace CreateClosureData
         {
 
             IWebElement incidentSearch;
-            IWebElement requestorElement;
-            IWebElement categoryElement;
+            //IWebElement requestorElement;
+            //IWebElement categoryElement;
             IWebElement tableElement;
-            IWebElement descriptionElement;
+            //IWebElement descriptionElement;
             Ticket thisTicket = new Ticket();
             int i = 0;
 
@@ -92,46 +92,26 @@ namespace CreateClosureData
 
             Thread.Sleep(2000);
 
+
+            
             Type[] ignores = new Type[] { typeof(OpenQA.Selenium.StaleElementReferenceException) };
-            //Get the elements we need and their text
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
             wait.PollingInterval = TimeSpan.FromSeconds(30);
             wait.IgnoreExceptionTypes(ignores);
 
 
-            //driver.Navigate().Refresh();
-
-            //driver.FindElement(By.XPath("//input[@name='AM_RECIPIENT.LAST_NAME']"));        // Gets the manager
-           
+            //Getting the elments we need off the web page
             thisTicket.Requestor = wait.Until(theDriver => theDriver.FindElement(By.XPath("//input[@name='AM_RECIPIENT.LAST_NAME']"))).GetAttribute("value").ToString();
-            //thisTicket.Requestor = requestorElement.GetAttribute("value").ToString();
 
-            try // This next https://stackoverflow.com/questions/37837407/c-sharp-selenium-webdriver-raise-invalidoperationexception-ocurred-in-webdriver
-            {
-                thisTicket.Category = wait.Until(theDriver => theDriver.FindElement(By.XPath("//input[contains(@id, 'SD_CATALOG.TITLE_EN')] [contains(@class, 'form_input_ro')]"))).GetAttribute("value").ToString();
-            }catch(Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-            }
-                //categoryElement = driver.FindElement(By.XPath("//input[contains(@id, 'SD_CATALOG.TITLE_EN')] [contains(@class, 'form_input_ro')]"));
-            //thisTicket.Category = categoryElement.GetAttribute("value").ToString();
-
+            thisTicket.Category = wait.Until(theDriver => theDriver.FindElement(By.XPath("//input[contains(@id, 'SD_CATALOG.TITLE_EN')] [contains(@class, 'form_input_ro')]"))).GetAttribute("value").ToString();
 
             tableElement = wait.Until(theDriver => theDriver.FindElement(By.XPath("//table[@id='tbl_dialog_body_section_1_0']")));
-            //tableElement = driver.FindElement(By.XPath("//table[@id='tbl_dialog_body_section_1_0']"));
-            //thisTicket.SolvedBy = tableElement.FindElement(By.XPath("//td[contains(., ',')]")).Text;
-
-
+           
             thisTicket.Description = wait.Until(theDriver => theDriver.FindElement(By.XPath("//div[@id='SD_REQUEST_COMMENT1']"))).Text;
-            //descriptionElement = driver.FindElement(By.XPath("//div[@id='SD_REQUEST_COMMENT1']"));
-            //thisTicket.Description = descriptionElement.Text;
+            
 
 
-            //Disgusting code below
-
-            //IList<IWebElement> tableRow = tableElement.FindElements(By.TagName("tr"));
             IList<IWebElement> tableRow;
-
             try
             {
                 tableRow = tableElement.FindElements(By.TagName("tr"));
@@ -143,7 +123,7 @@ namespace CreateClosureData
 
 
             IList<IWebElement> td;
-            string solvedBy;
+           
             i = 0;
             int z = 0;
             Console.WriteLine("***TR Data***");
@@ -183,11 +163,11 @@ namespace CreateClosureData
                 using (var cw = new CsvWriter(streamWriter))
                 {
 
-
+                    
                     cw.WriteField(thisTicket.Requestor);
                     cw.WriteField(thisTicket.Category);
                     cw.WriteField(thisTicket.SolvedBy);
-
+                    cw.NextRecord();
                 }
                 
                 
