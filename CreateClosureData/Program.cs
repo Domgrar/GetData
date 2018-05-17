@@ -1,9 +1,11 @@
-﻿using OpenQA.Selenium;
+﻿using CsvHelper;
+using OpenQA.Selenium;
 using OpenQA.Selenium.IE;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -57,6 +59,8 @@ namespace CreateClosureData
                 Console.WriteLine("Solved by : " + thisTicket.SolvedBy);
                 Console.WriteLine("Description : " + thisTicket.Description);
                 Console.WriteLine("**************************************************************");
+
+                WriteAllValues(thisTicket);
             }
 
             Console.ReadLine();
@@ -172,9 +176,28 @@ namespace CreateClosureData
         }
         public static bool WriteAllValues(Ticket thisTicket)
         {
+            try
+            {
+                using (var memoryStream = new MemoryStream())
+                using (var streamWriter = new StreamWriter(@"C:\FTG\boi.csv", true))
+                using (var cw = new CsvWriter(streamWriter))
+                {
 
 
-            return true;
+                    cw.WriteField(thisTicket.Requestor);
+                    cw.WriteField(thisTicket.Category);
+                    cw.WriteField(thisTicket.SolvedBy);
+
+                }
+                
+                
+                return true;
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
+         
         }
 
         public static List<string> GetIncidentList()
