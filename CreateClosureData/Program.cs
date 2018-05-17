@@ -17,43 +17,39 @@ namespace CreateClosureData
     {
         static void Main(string[] args)
         {
+            //Variables we need
             List<string> ticketList = new List<string>();
             IWebElement dropDownMenu;
             Ticket thisTicket = new Ticket();
+
+            //Creating the webdriver
             var options = new InternetExplorerOptions();
             options.IntroduceInstabilityByIgnoringProtectedModeSettings = true;
-
-            // Search for ticket in EV
-            
             IWebDriver driver = new InternetExplorerDriver(options);
-            driver.Navigate().GoToUrl("https://dhgllp.easyvista.com/");
 
+            //Creating the webdriver wait
+            Type[] ignores = new Type[] { typeof(OpenQA.Selenium.StaleElementReferenceException) };
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait.PollingInterval = TimeSpan.FromSeconds(30);
+            wait.IgnoreExceptionTypes(ignores);
+
+            //Goto ev
+            driver.Navigate().GoToUrl("https://dhgllp.easyvista.com/");
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
 
+            //Find the search textbox
             dropDownMenu = driver.FindElement(By.XPath("//input[@id='GlobalCurrentQuerycombo-ui']"));
-
             dropDownMenu.SendKeys(Keys.Control + "a");
             dropDownMenu.SendKeys("Incidents");
             dropDownMenu.SendKeys(Keys.ArrowDown);
             dropDownMenu.SendKeys(Keys.Enter);
 
-            
-            
-
-
-           
-
-    
-
-
+            //Search each ticket and get it's info from EV
             ticketList = GetIncidentList();
-            
             foreach(string item in ticketList)
             {
+                thisTicket = getAllTicketData(item, driver, wait);
 
-                thisTicket = getAllTicketData(item, driver);
-
-                //Block to display all values for testing
                 Console.WriteLine("Requesting Person : " + thisTicket.Requestor);
                 Console.WriteLine("Category : " + thisTicket.Category);
                 Console.WriteLine("Solved by : " + thisTicket.SolvedBy);
@@ -71,14 +67,11 @@ namespace CreateClosureData
         /// </summary>
         /// <param name="incidentNumber"></param>
         /// <returns></returns>
-        public static Ticket getAllTicketData(string incidentNumber, IWebDriver driver)
+        public static Ticket getAllTicketData(string incidentNumber, IWebDriver driver, WebDriverWait wait)
         {
 
             IWebElement incidentSearch;
-            //IWebElement requestorElement;
-            //IWebElement categoryElement;
             IWebElement tableElement;
-            //IWebElement descriptionElement;
             Ticket thisTicket = new Ticket();
             int i = 0;
 
@@ -91,13 +84,6 @@ namespace CreateClosureData
             incidentSearch.SendKeys(Keys.Enter);
 
             Thread.Sleep(2000);
-
-
-            
-            Type[] ignores = new Type[] { typeof(OpenQA.Selenium.StaleElementReferenceException) };
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.PollingInterval = TimeSpan.FromSeconds(30);
-            wait.IgnoreExceptionTypes(ignores);
 
 
             //Getting the elments we need off the web page
@@ -149,11 +135,14 @@ namespace CreateClosureData
                 i++;
             }
       
-            
-            
-
             return thisTicket;
         }
+
+        /// <summary>
+        /// Method to write values to csv file
+        /// </summary>
+        /// <param name="thisTicket"></param>
+        /// <returns></returns>
         public static bool WriteAllValues(Ticket thisTicket)
         {
             try
@@ -180,6 +169,10 @@ namespace CreateClosureData
          
         }
 
+        /// <summary>
+        /// Method to read all incident ticket from text file
+        /// </summary>
+        /// <returns></returns>
         public static List<string> GetIncidentList()
         {
             List<string> iList = new List<string>();
